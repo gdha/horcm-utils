@@ -3,7 +3,9 @@ if [[ "$(id -u)" != "0" ]]; then
     echo "Must be root - exit"
     exit 1
 fi
-
+if [[ "$(uname -s)" != "Linux" ]]; then
+    echo "Script $0 is meant for Linux 0nly"
+fi
 # First check it HORCM is installed, otherwise, it makes no sense to run this script
 if [[ ! -d /HORCM/usr/bin ]]; then
     echo "HORCM seems not to be installed as /HORCM/usr/bin was not present?"

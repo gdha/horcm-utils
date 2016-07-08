@@ -1,0 +1,57 @@
+# Makefile for horcm-utils
+
+name = horcm-utils
+specfile = horcm-utils.spec
+
+LOCALDIR = usr/local/sbin
+DESTDIR =
+
+version := $(shell awk 'BEGIN { FS=":" } /^Version:/ { print $$2}' $(specfile) | sed -e 's/ //g' -e 's/\$$//')
+
+prefix  := $(shell grep "define BCdir" $(specfile) | awk '{print $$3}')
+bindir = $(prefix)
+
+distversion = $(version)
+rpmrelease =
+
+.PHONY: doc
+
+all:
+	@echo "Nothing to build. Use \`make help' for more information."
+
+help:
+	@echo -e "horcm-utils make targets:\n\
+\n\
+  install         - Install HORCM Utilities to DESTDIR (may replace files)\n\
+  dist            - Create tar file\n\
+  rpm             - Create RPM package\n\
+\n\
+"
+
+clean:
+	@echo -e "\033[1m== Cleanup temporary files ==\033[0;0m"
+	-rm -f $(name)-$(distversion).tar.gz
+
+dist: clean $(name)-$(distversion).tar.gz
+
+install: BC-exec.sh
+	@echo -e "\033[1m== Installing binary ==\033[0;0m"
+	install -Dp -m0755 $(LOCALDIR)/BC-exec.sh $(DESTDIR)$(bindir)/BC-exec.sh
+	install -Dp -m0755 $(LOCALDIR)/PairDisplay.sh $(DESTDIR)$(bindir)/PairDisplay.sh
+	install -Dp -m0755 $(LOCALDIR)/CheckHorcmConsistency.sh $(DESTDIR)$(bindir)/CheckHorcmConsistency.sh
+	install -Dp -m0755 $(LOCALDIR)/horcmd-initscript-rhel-script.sh $(DESTDIR)$(bindir)/horcmd-initscript-rhel-script.sh
+
+BC-exec.sh:
+
+$(name)-$(distversion).tar.gz: BC-exec.sh $(specfile)
+	@echo -e "\033[1m== Building archive $(name)-$(distversion) ==\033[0;0m"
+	tar -czf $(name)-$(distversion).tar.gz --transform='s,^,$(name)-$(version)/,S' \
+		$(LOCALDIR)/BC-exec.sh $(specfile) Makefile $(LOCALDIR)/PairDisplay.sh $(LOCALDIR)/CheckHorcmConsistency.sh Makefile.linux $(LOCALDIR)/horcmd-initscript-rhel-script.sh
+
+rpm: dist
+	@echo -e "\033[1m== Building RPM package $(name)-$(distversion)==\033[0;0m"
+	rpmbuild -ta --clean \
+		--define "_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm" \
+		--define "debug_package %{nil}" \
+		--define "_rpmdir %(pwd)" $(name)-$(distversion).tar.gz
+

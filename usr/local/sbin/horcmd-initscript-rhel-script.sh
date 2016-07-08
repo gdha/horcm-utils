@@ -12,6 +12,11 @@ if [[ ! -d /HORCM/usr/bin ]]; then
     exit 1
 fi
 
+if ! grep -q 6 /etc/system-release ; then
+    echo "Script is only meaningful on RHEL 6 kind of systems"
+    exit 1
+fi
+
 echo "Creating init script /etc/init.d/horcmd"
 cat > /etc/init.d/horcmd <<EOF
 #!/bin/sh

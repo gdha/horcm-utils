@@ -1,0 +1,52 @@
+################################################################################
+# Version Info : @(#)horcm-utils.psf	1.0	08/Jul/2016
+# Author       : Gratien D'haese < gratien.dhaese @ gmail.com >
+################################################################################
+
+    tag horcm-utils
+    title HORCM Utilities Scripts
+    description HORCM Utilities Scripts
+    copyright (c)Copyright GNU GPLv3
+    number 1.0
+
+product
+    tag horcm-utils
+    title HORCM Utilities Scripts
+    revision 1.0
+    description HORCM Utilities Scripts
+    copyright (c)Copyright GNU GPLv3
+    #architecture HP-UX_B.11.11_32/64
+    machine_type *
+    os_name HP-UX
+    os_release ?.11.*
+    os_version *
+    directory /usr/local/sbin
+    is_locatable false
+    is_patch false
+    vendor_tag GPL
+    postinstall                   ./postinstall.sh 
+
+    fileset
+        tag SCRIPTS
+        title HORCM Utilities Scripts
+        revision 1.0
+        description HORCM Utilities Scripts
+        #architecture HP-UX_B.11.11_32/64
+        machine_type *
+        os_name HP-UX
+        os_release ?.11.*
+        os_version *
+        is_kernel false
+        is_reboot false
+        is_patch false
+        is_sparse false
+
+        directory usr/local/sbin = /usr/local/sbin
+        file_permissions -o root -g bin -m 755
+        file -m 554 -o root -g sys BC-exec.sh
+        file -m 554 -o root -g sys PairDisplay.sh
+        file -m 554 -o root -g sys CheckHorcmConsistency.sh
+
+    end # fileset SCRIPTS
+
+end # product
